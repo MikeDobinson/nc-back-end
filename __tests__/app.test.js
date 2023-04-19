@@ -18,10 +18,20 @@ describe('/api/topics', () => {
         expect(topics.length).toBe(3);
         topics.forEach((topic) => {
           expect(topic).toBeObject();
-
           expect(topic).toHaveProperty('slug');
           expect(topic).toHaveProperty('description');
         });
+      });
+  });
+});
+
+describe('invalid endpoint', () => {
+  it('404: returns an error message when given an invalid endpoint', () => {
+    return request(app)
+      .get('/api/invalid')
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe('Page not found');
       });
   });
 });
