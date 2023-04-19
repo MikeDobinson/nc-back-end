@@ -159,4 +159,77 @@ describe('/api/articles/:article_id/comments', () => {
         });
     });
   });
+  describe('POST', () => {
+    it('200: succesful post', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ username: 'butter_bridge', body: 'test comment' })
+        .expect(201)
+        .then(({ body: { comment } }) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: 'test comment',
+            article_id: 1,
+            author: 'butter_bridge',
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it('400: if trying to post to an article ID of invalid type', () => {
+      return request(app)
+        .post('/api/articles/one/comments')
+        .send({ username: 'butter_bridge', body: 'test comment' })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+    it('404: if trying to post to an article ID that does not exist yet', () => {
+      return request(app)
+        .post('/api/articles/999/comments')
+        .send({ username: 'butter_bridge', body: 'test comment' })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Article not found');
+        });
+    });
+    it('400: if trying to post a comment in the wrong format', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ body: 'test comment' })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+    it('400: if trying to post a comment with a username that does not exist', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ username: 'one', body: 'test comment' })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+    it('200: ignores any additional properties in the request body', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({
+          username: 'butter_bridge',
+          body: 'test comment',
+          hotel: 'trivago',
+        })
+        .then(({ body: { comment } }) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: 'test comment',
+            article_id: 1,
+            author: 'butter_bridge',
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+  });
 });
