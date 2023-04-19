@@ -5,6 +5,7 @@ const {
   getAllArticles,
   getArticleById,
 } = require('./controllers/articles.controllers');
+const { getCommentsOnArticle } = require('./controllers/comments.controllers');
 const {
   handleCustomErrors,
   handleServerErrors,
@@ -17,6 +18,8 @@ app.get('/api/topics', getAllTopics);
 
 app.get('/api/articles', getAllArticles);
 app.get('/api/articles/:article_id', getArticleById);
+
+app.get('/api/articles/:article_id/comments', getCommentsOnArticle);
 
 app.get('/*', (req, res) => {
   res.status(404).send({ msg: 'Page not found' });
