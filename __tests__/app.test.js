@@ -110,3 +110,28 @@ describe('api/articles', () => {
     });
   });
 });
+
+describe('/api/articles/:article_id/comments', () => {
+  describe('GET', () => {
+    it('200: returns an array of comments sorted by created_at in desc order', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeArray();
+          expect(comments).toBeSortedBy('created_at', {
+            descending: true,
+          });
+          comments.forEach((comment) => {
+            expect(comment).toBeObject();
+            expect(comment).toHaveProperty('comment_id');
+            expect(comment).toHaveProperty('author');
+            expect(comment).toHaveProperty('article_id');
+            expect(comment).toHaveProperty('votes');
+            expect(comment).toHaveProperty('created_at');
+            expect(comment).toHaveProperty('body');
+          });
+        });
+    });
+  });
+});
