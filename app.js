@@ -2,7 +2,11 @@ const express = require('express');
 const app = express();
 const { getAllTopics } = require('./controllers/topics.controllers');
 const { getArticleById } = require('./controllers/articles.controllers');
-const { handleCustomErrors } = require('./controllers/errors.controllers');
+const {
+  handleCustomErrors,
+  handleServerErrors,
+  handlePsqlErrors,
+} = require('./controllers/errors.controllers');
 
 app.use(express.json());
 
@@ -14,5 +18,7 @@ app.get('/*', (req, res) => {
 });
 
 app.use(handleCustomErrors);
+app.use(handlePsqlErrors);
+app.use(handleServerErrors);
 
 module.exports = app;

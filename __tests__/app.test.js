@@ -64,5 +64,13 @@ describe('/api/articles/:article_id', () => {
           expect(msg).toBe('Article not found');
         });
     });
+    it('400: returns error if impossible article ID is entered', () => {
+      return request(app)
+        .get('/api/articles/one')
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
   });
 });
