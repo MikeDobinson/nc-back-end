@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const { getAllTopics } = require('./controllers/topics.controllers');
-const { getArticleById } = require('./controllers/articles.controllers');
+const {
+  getAllArticles,
+  getArticleById,
+} = require('./controllers/articles.controllers');
 const {
   handleCustomErrors,
   handleServerErrors,
@@ -11,6 +14,8 @@ const {
 app.use(express.json());
 
 app.get('/api/topics', getAllTopics);
+
+app.get('/api/articles', getAllArticles);
 app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/*', (req, res) => {
