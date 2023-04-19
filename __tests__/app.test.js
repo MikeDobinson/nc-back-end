@@ -74,3 +74,39 @@ describe('/api/articles/:article_id', () => {
     });
   });
 });
+
+describe('api/articles', () => {
+  describe('GET', () => {
+    it('200: returns an array of article objects ', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeArray();
+          expect(articles.length).toBe(12);
+          articles.forEach((article) => {
+            expect(article).toBeObject();
+            expect(article).toHaveProperty('article_id');
+            expect(article).toHaveProperty('title');
+            expect(article).toHaveProperty('topic');
+            expect(article).toHaveProperty('author');
+            expect(article).toHaveProperty('body');
+            expect(article).toHaveProperty('created_at');
+            expect(article).toHaveProperty('votes');
+            expect(article).toHaveProperty('article_img_url');
+            expect(article).toHaveProperty('comment_count');
+          });
+        });
+    });
+    it('200: returns an array of article objects with the correct default sort order', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy('created_at', {
+            descending: true,
+          });
+        });
+    });
+  });
+});
