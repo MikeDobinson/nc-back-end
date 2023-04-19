@@ -133,5 +133,30 @@ describe('/api/articles/:article_id/comments', () => {
           });
         });
     });
+    it('200: an empty array if no comments assigned to an existing review', () => {
+      return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeArray();
+          expect(comments.length).toBe(0);
+        });
+    });
+    it('404: returns an error if an unassigned article ID is entered', () => {
+      return request(app)
+        .get('/api/articles/999/comments')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Article not found');
+        });
+    });
+    it('400: returns an error if an impossible article ID is entered', () => {
+      return request(app)
+        .get('/api/articles/one/comments')
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
   });
 });
