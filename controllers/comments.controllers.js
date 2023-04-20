@@ -32,15 +32,13 @@ exports.postNewCommentOnArticle = (req, res, next) => {
 };
 
 exports.deleteCommentById = (req, res, next) => {
-  console.log('hello');
   const { comment_id } = req.params;
   checkCommentExists(comment_id)
     .then(() => {
-      console.log('removing comment');
       return removeCommentById(comment_id);
     })
     .then(() => {
-      res.sendStatus(204).send({});
+      res.sendStatus(204);
     })
     .catch(next);
 };

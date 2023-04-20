@@ -14,9 +14,13 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  fetchAllArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const { topic, order, sort_by } = req.query;
+
+  fetchAllArticles(topic, order, sort_by)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };
 
 exports.patchArticleById = (req, res, next) => {
