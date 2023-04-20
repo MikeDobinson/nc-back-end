@@ -28,6 +28,8 @@ exports.fetchAllArticles = () => {
 };
 
 exports.editArticleById = (article_id, inc_votes) => {
+  if (!inc_votes) inc_votes = 0;
+
   return db
     .query(
       `UPDATE articles 
