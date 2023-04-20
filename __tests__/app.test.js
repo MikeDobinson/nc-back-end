@@ -73,6 +73,18 @@ describe('/api/articles/:article_id', () => {
         });
     });
   });
+  describe('PATCH', () => {
+    it('200: returns with the updated article object ', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body: { article } }) => {
+          const { votes } = article;
+          expect(votes).toBe(101);
+        });
+    });
+  });
 });
 
 describe('api/articles', () => {
