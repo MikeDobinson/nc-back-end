@@ -73,6 +73,64 @@ describe('/api/articles/:article_id', () => {
         });
     });
   });
+  describe('PATCH', () => {
+    it('200: returns with the updated article object ', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body: { article } }) => {
+          const { votes } = article;
+          expect(votes).toBe(101);
+        });
+    });
+    it('400: wrong data type', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 'one' })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+    it('404: if given an ID that is not yet assigned to a review', () => {
+      return request(app)
+        .patch('/api/articles/999')
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Article not found');
+        });
+    });
+    it('400: if given an invalid ID', () => {
+      return request(app)
+        .patch('/api/articles/one')
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+    it('200: returns with the updated article object with no change if no inc_votes is sent', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({})
+        .expect(200)
+        .then(({ body: { article } }) => {
+          const { votes } = article;
+          expect(votes).toBe(100);
+        });
+    });
+    it('400: if given an object with the wrong value type', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 'one' })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+  });
 });
 
 describe('api/articles', () => {

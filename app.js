@@ -4,6 +4,7 @@ const { getAllTopics } = require('./controllers/topics.controllers');
 const {
   getAllArticles,
   getArticleById,
+  patchArticleById,
 } = require('./controllers/articles.controllers');
 const {
   getCommentsOnArticle,
@@ -23,6 +24,8 @@ app.get('/api/articles/:article_id', getArticleById);
 app.get('/api/articles/:article_id/comments', getCommentsOnArticle);
 
 app.post('/api/articles/:article_id/comments', postNewCommentOnArticle);
+
+app.patch('/api/articles/:article_id', patchArticleById);
 
 app.get('/*', (req, res) => {
   res.status(404).send({ msg: 'Page not found' });
