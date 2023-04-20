@@ -12,20 +12,62 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
-exports.fetchAllArticles = () => {
-  return db
-    .query(
-      `SELECT articles.*, count(comments.comment_id) AS comment_count 
-      FROM articles 
-      LEFT JOIN comments ON articles.article_id = comments.article_id 
-      GROUP BY articles.article_id 
-      ORDER BY articles.created_at DESC;
-  `
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.fetchAllArticles = (topic, order = 'DESC', sort_by = 'created_at') => {
+  const queryParameters = [];
+  if (!['ASC', 'DESC', 'asc', 'desc'].includes(order)) {
+    return Promise.reject({ status: 400, msg: 'Bad request' });
+  }
+
+  if (
+    ![
+      'article_id',
+      'title',
+      'topic',
+      'author',
+      'body',
+      'created_at',
+      'votes',
+      'article_img_url',
+      'comment_count',
+    ].includes(sort_by)
+  ) {
+    return Promise.reject({ status: 400, msg: 'Bad request' });
+  }
+
+  let queryString = `SELECT articles.*, count(comments.comment_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id=comments.article_id `;
+
+  if (topic) {
+    queryString += ` WHERE topic = $1 `;
+    queryParameters.push(topic);
+  }
+
+  queryString += ` GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order};`;
+
+  return db.query(queryString, queryParameters).then(({ rows }) => {
+    if (!rows.length) {
+      return Promise.reject({ status: 404, msg: 'Articles not found' });
+    } else {
+      return rows;
+    }
+  });
 };
+
+//   return db
+//     .query(
+//       `SELECT articles.*, count(comments.comment_id) AS comment_count
+//       FROM articles
+//       LEFT JOIN comments ON articles.article_id = comments.article_id
+//       GROUP BY articles.article_id
+//       ORDER BY articles.created_at DESC;
+//   `
+//     )
+//     .then((result) => {
+//       return result.rows;
+//     });
+// };
 
 exports.editArticleById = (article_id, inc_votes) => {
   if (!inc_votes) inc_votes = 0;

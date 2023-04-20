@@ -33,7 +33,6 @@ exports.removeCommentById = (comment_id) => {
 };
 
 exports.checkCommentExists = (commentId) => {
-  console.log('we are checking');
   return db
     .query(`SELECT * FROM comments WHERE comment_id = ($1)`, [commentId])
     .then(({ rows }) => {

@@ -167,6 +167,84 @@ describe('api/articles', () => {
         });
     });
   });
+  describe('QUERIES', () => {
+    describe('topic', () => {
+      it('200: returns an array of article objects where all topics match an input', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).not.toBe(0);
+            articles.forEach((article) => {
+              expect(article.topic).toBe('mitch');
+            });
+          });
+      });
+      it('404: returns an error if the topic does not exist', () => {
+        return request(app)
+          .get('/api/articles?topic=one')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Articles not found');
+          });
+      });
+    });
+    describe('order', () => {
+      it('200: can change order of sort', () => {
+        return request(app)
+          .get('/api/articles?order=asc')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy('created_at', {
+              ascending: true,
+            });
+          });
+      });
+      it('400: if anything other than ASC or DESC are input', () => {
+        return request(app)
+          .get('/api/articles?order=one')
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Bad request');
+          });
+      });
+    });
+    describe('sort_by', () => {
+      it('200: can change sort_by column', () => {
+        return request(app)
+          .get('/api/articles?sort_by=votes')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy('votes', {
+              descending: true,
+            });
+          });
+      });
+      it('400: if anything other than a valid column is input', () => {
+        return request(app)
+          .get('/api/articles?sort_by=one')
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Bad request');
+          });
+      });
+    });
+    describe('multiple queries', () => {
+      it('200: can handle multiple queries at once', () => {
+        return request(app)
+          .get('/api/articles?sort_by=votes&order=asc&topic=mitch')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy('votes', {
+              ascending: true,
+            });
+            articles.forEach((article) => {
+              expect(article.topic).toBe('mitch');
+            });
+          });
+      });
+    });
+  });
 });
 
 describe('/api/articles/:article_id/comments', () => {
