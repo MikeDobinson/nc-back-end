@@ -291,3 +291,40 @@ describe('/api/articles/:article_id/comments', () => {
     });
   });
 });
+
+describe('/api/comments/:comment_id', () => {
+  describe('DELETE', () => {
+    it('204: deletes the relevant comment from the table', () => {
+      return request(app)
+        .delete('/api/comments/3')
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+        })
+        .then(() => {
+          return connection.query(
+            `SELECT * FROM comments WHERE comment_id = 3`
+          );
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        });
+    });
+    it('404: if given a comment ID that does not exist', () => {
+      return request(app)
+        .delete('/api/comments/999')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Comment not found');
+        });
+    });
+    it('400: if given a comment ID of invalid type', () => {
+      return request(app)
+        .delete('/api/comments/one')
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe('Bad request');
+        });
+    });
+  });
+});
